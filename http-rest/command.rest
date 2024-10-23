@@ -1,0 +1,83 @@
+###
+POST http://localhost:3000/api/v1/commands
+Content-Type: application/json
+
+{
+    "name": "Command List",
+    "command": "--command-list",
+    "description": "Menampilkan daftar command yang bisa digunakan untuk menjalankan bot.",
+    "isParent": false,
+    "parentId": null,
+    "isActive": true
+}
+
+###
+POST http://localhost:3000/api/v1/commands
+Content-Type: application/json
+
+{
+    "name": "Driver Ready",
+    "command": "--ready",
+    "description": "Mengubah status driver menjadi aktif.",
+    "isParent": false,
+    "parentId": null,
+    "isActive": true
+}
+
+###
+POST http://localhost:3000/api/v1/commands
+Content-Type: application/json
+
+{
+    "name": "Driver Busy",
+    "command": "--busy",
+    "description": "Mengubah status driver menjadi nonaktif.",
+    "isParent": false,
+    "parentId": null,
+    "isActive": true
+}
+
+###
+POST http://localhost:3000/api/v1/commands
+Content-Type: application/json
+
+{
+    "name": "Register User",
+    "command": "--register",
+    "description": "Registrasi user untuk menggunakan bot.",
+    "isParent": false,
+    "parentId": null,
+    "isActive": true
+}
+
+###
+POST http://localhost:3000/api/v1/commands
+Content-Type: application/json
+
+{
+    "name": "Start Bot",
+    "command": "--start",
+    "description": "Mengaktifkan bot.",
+    "isParent": false,
+    "parentId": null,
+    "isActive": true
+}
+
+###
+POST http://localhost:3000/api/v1/commands
+Content-Type: application/json
+
+{
+    "name": "Register Partner",
+    "command": "-register",
+    "description": "Mendaftarkan user menjadi mitra/partner",
+    "isParent": false,
+    "parentId": null,
+    "isPartner": true,
+    "isAdmin": true,
+    "isActive": true,
+    "order": 3
+}
+
+###
+GET http://localhost:3000/api/v1/commands

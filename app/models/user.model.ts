@@ -126,7 +126,7 @@ const userSchema: Schema<IUser> = new Schema(
       type: Schema.Types.ObjectId,
       required: false,
       default: null,
-      ref: "Partner",
+      ref: "Partners",
     },
     whatsapp: {
       id: {

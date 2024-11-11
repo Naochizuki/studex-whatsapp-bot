@@ -22,7 +22,7 @@ export const createCollectionPartner = async (
       isReady: false,
       reason: null,
       state: "askPartner",
-      isActive: true,
+      isActive: false,
     };
 
     const newPartner: IPartner = new Partner(payload);
@@ -42,18 +42,20 @@ export const createCollectionPartner = async (
 
 export const partnerReady = async (
   client: Client,
+  msg: string,
   message: Message,
   contact: Contact,
   user: IUser
 ) => {
   try {
+    const reason = msg.slice(6).trim();
     const partner = await Partner.findOne({ userId: user.id });
 
     if (!partner)
       message.reply("Maaf, anda bukan tidak termasuk dalam mitra kami!");
     else {
       partner.isReady = true;
-      partner.reason = "";
+      partner.reason = reason ?? "";
       await partner.save();
       message.reply("Status partner berhasil diubah menjadi ready.");
     }
@@ -152,7 +154,9 @@ export const partnerStatus = async (
 
           return `✅ ${getGenderEmote(partner.userId?.gender ?? "-")}${
             partner.userId?.name ?? partner.userId?.credential.username ?? "-"
-          } ${chat.isGroup ? `@${partner.userId?.whatsapp.number}` : ""}`;
+          } (${formatDate(partner.updatedAt)}${
+            chat.isGroup ? `, @${partner.userId?.whatsapp.number}` : ""
+          })${partner.reason?.length ? `: ${partner.reason}` : ""}`;
         })
         .join("\n");
 
@@ -187,6 +191,7 @@ export const partnerStatus = async (
       replyMessage(message, reply, mentions);
     }
   } catch (err: any) {
+    console.log(err.message);
     replyMessage(message, "Terjadi kesalahan saat memperoleh status mitra.");
   }
 };
@@ -445,6 +450,7 @@ const processMotor = async (
     if (trimmedMsg === "skip") {
       partner.state = "finished";
       partner.isReady = true;
+      partner.isActive = true;
       await partner.save();
 
       user.state = "registered";
@@ -524,6 +530,7 @@ const processPoliceNumber = async (
 
     partner.state = "finished";
     partner.isReady = true;
+    partner.isActive = true;
     await partner.save();
 
     user.state = "registered";

@@ -1,12 +1,11 @@
 import type { Chat, Client, Contact, Message } from "whatsapp-web.js";
 import type { IGroupChat } from "../../app/models/groupChat.model";
 import { getActiveCommands, getCommandList } from "./command";
-import type { IUser } from "../../app/models/user.model";
 import GroupChat from "../../app/models/groupChat.model";
 import { registerGroupChat, startUser, startUserNext } from "./start";
 import { replyMessage, sendMessage } from "../common";
 import { getAllGroupChat } from "./groupChat";
-import User from "../../app/models/user.model";
+import User, { type IUser } from "../../app/models/user.model";
 import Partner from "../../app/models/partner.model";
 import {
   createCollectionPartner,
@@ -16,6 +15,8 @@ import {
   partnerStatus,
 } from "./partner";
 import { sendErrorToAdmin } from "./error";
+import { handleOrderForwardedMessage } from "./order";
+import type { ICommand } from "../../app/models/command.model";
 
 export const handleCommandGroupFlow = async (
   client: Client,
@@ -35,7 +36,15 @@ export const handleCommandGroupFlow = async (
   const command = await getActiveCommands(client, chat, contact, msg);
 
   if (command) {
-    await handleGroupCommand(msg, chat, contact, message, client, group);
+    await handleGroupCommand(
+      msg,
+      chat,
+      contact,
+      message,
+      client,
+      group,
+      command
+    );
   }
 };
 
@@ -146,7 +155,8 @@ export const handleNonCommandFlow = async (
 
   if (
     isUserInRegistrationFlow(user.state) ||
-    isPartnerInRegistrationFlow(partner?.state ?? "")
+    isPartnerInRegistrationFlow(partner?.state ?? "") ||
+    isInFlow(user.state)
   ) {
     await handleUserLastCommand(msg, chat, contact, message, client, user);
   }
@@ -172,6 +182,11 @@ const isPartnerInRegistrationFlow = (state: string) => {
     "askPoliceNumber",
   ];
   return registrationStates.includes(state ?? "");
+};
+
+const isInFlow = (state: string) => {
+  const userStates = ["addOrder"];
+  return userStates.includes(state ?? "");
 };
 
 const handleUserLastCommand = async (
@@ -212,6 +227,10 @@ const handleUserLastCommand = async (
         default:
           break;
       }
+    }
+
+    if (!chat.isGroup && user.state === "addOrder") {
+      await handleOrderForwardedMessage(client, msg, message, contact, user);
     }
   } catch (err: any) {
     sendErrorToAdmin(client, contact, err.message);
@@ -298,7 +317,8 @@ const handleGroupCommand = async (
   contact: Contact,
   message: Message,
   client: Client,
-  group: IGroupChat
+  group: IGroupChat,
+  command: ICommand
 ) => {
   try {
     if (!msg || !group)
@@ -321,6 +341,20 @@ const handleGroupCommand = async (
           break;
         case msg.startsWith("-status") && msg:
           await partnerStatus(message, msg, chat);
+          break;
+        case msg.startsWith("-ready") && msg:
+          if (command.isPersonal) {
+            const user = await User.searchUser(contact.id._serialized, false);
+
+            if (user) await partnerReady(client, msg, message, contact, user);
+          }
+          break;
+        case msg.startsWith("-busy") && msg:
+          if (command.isPersonal) {
+            const user = await User.searchUser(contact.id._serialized, false);
+
+            if (user) await partnerBusy(client, msg, message, contact, user);
+          }
           break;
         default:
           replyMessage(
@@ -373,8 +407,8 @@ const handleUserCommand = async (
             );
           }
           break;
-        case "-ready":
-          await partnerReady(client, message, contact, user);
+        case msg.startsWith("-ready") && msg:
+          await partnerReady(client, msg, message, contact, user);
           break;
         case msg.startsWith("-busy") && msg:
           await partnerBusy(client, msg, message, contact, user);
@@ -390,6 +424,15 @@ const handleUserCommand = async (
           break;
         case msg.startsWith("-status") && msg:
           await partnerStatus(message, msg, chat);
+          break;
+        case "-addorder":
+          await handleOrderForwardedMessage(
+            client,
+            msg,
+            message,
+            contact,
+            user
+          );
           break;
         default:
           replyMessage(

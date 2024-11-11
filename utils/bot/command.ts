@@ -32,7 +32,7 @@ export const getActiveCommands = async (
 
       if (!user?.isAdmin) filter.isAdmin = false;
     }
-    const commands = await Command.find(filter, "command");
+    const commands = await Command.find(filter, "command isPersonal");
     const searchCommand =
       msg.indexOf(" ") !== -1 ? msg.substring(0, msg.indexOf(" ")) : msg;
     return commands

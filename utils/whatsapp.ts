@@ -20,7 +20,11 @@ export const client1 = new Client({
     args: [
       '--no-sandbox', 
       '--disable-setuid-sandbox', 
-      '--disable-extensions'
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu'
     ]
   }
 });

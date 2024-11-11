@@ -1,5 +1,5 @@
 import { Client, LocalAuth, type Chat, type Contact } from "whatsapp-web.js";
-import qrcode from "qrcode";
+import qrcode from "qrcode-terminal";
 import fs from "fs";
 import { isRegistered } from "./bot/user";
 import {

@@ -15,8 +15,7 @@ export const client1 = new Client({
     clientId: "whatsapp-bot-1",
   }),
   puppeteer: {
-    product: "chrome",
-    executablePath: "/usr/bin/chromium-browser"
+    product: "chrome"
   }
 });
 

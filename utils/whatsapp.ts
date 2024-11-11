@@ -30,7 +30,7 @@ app.get('/qr', (res, res) => {
 const connectWA = async () => {
   try {
     // Menampilkan QR Code untuk login
-    client1.on("qr", (qr) => {
+    client1.on("qr", async (qr) => {
       qrCodeUrl = await qrcode.toDataURL(qr);
 
       fs.writeFileSync('latest_qr.txt', qr);

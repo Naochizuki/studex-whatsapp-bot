@@ -19,7 +19,7 @@ export const client1 = new Client({
 });
 let qrCodeUrl = null;
 
-app.get('/qr', (res, res) => {
+app.get('/qr', (req, res) => {
   if (qrCodeUrl) {
     res.send(`<img src=${qrCodeUrl} alt="QR Code" />`);
   } else {

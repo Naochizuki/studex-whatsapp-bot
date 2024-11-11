@@ -15,6 +15,14 @@ export const client1 = new Client({
   authStrategy: new LocalAuth({
     clientId: "whatsapp-bot-1",
   }),
+  puppeteer: {
+    headless: true,
+    args: [
+      '--no-sandbox', 
+      '--disable-setuid-sandbox', 
+      '--disable-extensions'
+    ]
+  }
 });
 let qrCodeUrl = null;
 

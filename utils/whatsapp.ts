@@ -14,12 +14,6 @@ export const client1 = new Client({
   authStrategy: new LocalAuth({
     clientId: "whatsapp-bot-1",
   }),
-  puppeteer: {
-    args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox'
-        ],
-  }
 });
 
 const connectWA = async () => {

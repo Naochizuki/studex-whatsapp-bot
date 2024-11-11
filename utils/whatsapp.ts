@@ -1,5 +1,7 @@
 import { Client, LocalAuth, type Chat, type Contact } from "whatsapp-web.js";
-import qrcode from "qrcode-terminal";
+import { app } from '../index.ts';
+import qrcode from "qrcode";
+import fs from "fs";
 import { isRegistered } from "./bot/user";
 import {
   handleCommandGroupFlow,
@@ -15,13 +17,26 @@ export const client1 = new Client({
     clientId: "whatsapp-bot-1",
   }),
 });
+let qrCodeUrl = null;
+
+app.get('/qr', (res, res) => {
+  if (qrCodeUrl) {
+    res.send(`<img src=${qrCodeUrl} alt="QR Code" />`);
+  } else {
+    res.send('QR code not available yet.');
+  }
+})
 
 const connectWA = async () => {
   try {
     // Menampilkan QR Code untuk login
     client1.on("qr", (qr) => {
-      console.log("QR code received, please scan:");
-      qrcode.generate(qr, { small: true }); // Menampilkan QR di terminal
+      qrCodeUrl = await qrcode.toDataURL(qr);
+
+      fs.writeFileSync('latest_qr.txt', qr);
+      console.log('QR code saved to lastest_qr.txt');
+      // console.log("QR code received, please scan:");
+      // qrcode.generate(qr, { small: true }); // Menampilkan QR di terminal
     });
 
     // Event ketika sudah terautentikasi

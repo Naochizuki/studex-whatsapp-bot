@@ -14,6 +14,10 @@ export const client1 = new Client({
   authStrategy: new LocalAuth({
     clientId: "whatsapp-bot-1",
   }),
+  puppeteer: {
+    product: "chrome",
+    executablePath: "/usr/bin/chromium-browser"
+  }
 });
 
 const connectWA = async () => {

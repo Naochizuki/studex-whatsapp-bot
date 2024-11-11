@@ -1,5 +1,4 @@
 import { Client, LocalAuth, type Chat, type Contact } from "whatsapp-web.js";
-import { app } from '../index.ts';
 import qrcode from "qrcode";
 import fs from "fs";
 import { isRegistered } from "./bot/user";
@@ -18,14 +17,6 @@ export const client1 = new Client({
   }),
 });
 let qrCodeUrl = null;
-
-app.get('/qr', (req, res) => {
-  if (qrCodeUrl) {
-    res.send(`<img src=${qrCodeUrl} alt="QR Code" />`);
-  } else {
-    res.send('QR code not available yet.');
-  }
-})
 
 const connectWA = async () => {
   try {
@@ -119,6 +110,8 @@ const connectWA = async () => {
 
     // Inisialisasi client;
     client1.initialize();
+
+    return qrCodeUrl;
   } catch (err) {
     console.error(err);
     process.exit(1);

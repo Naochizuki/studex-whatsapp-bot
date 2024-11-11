@@ -8,7 +8,7 @@ import "dotenv/config";
 import CommandRoute from "./app/routers/command.route";
 
 export const app = express();
-const port = 8080;
+const port = 3000;
 
 connectDB();
 connectWA();

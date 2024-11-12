@@ -11,23 +11,7 @@ import {
 } from "./bot/handler";
 
 // Inisialisasi Whatsapp Client
-export const client1 = new Client({
-  authStrategy: new LocalAuth({
-    clientId: "whatsapp-bot-1",
-  }),
-  puppeteer: {
-    headless: true,
-    args: [
-      '--no-sandbox', 
-      '--disable-setuid-sandbox', 
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--disable-gpu'
-    ]
-  }
-});
+export const client1 = new Client();
 let qrCodeUrl = null;
 
 const connectWA = async () => {

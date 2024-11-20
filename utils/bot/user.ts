@@ -30,20 +30,21 @@ export const addUserTogroup = async (
 export const isRegistered = async (
   client: Client,
   chat: Chat,
-  contact: Contact
+  contact: Contact,
+  isGroup: boolean
 ) => {
   try {
-    let exist: null | IGroupChat | IUser = chat.isGroup
+    let exist: null | IGroupChat | IUser = isGroup
       ? await GroupChat.searchGroupChat(chat.id._serialized)
       : await User.searchUser(contact.id._serialized, false);
 
     return {
       exist: !!exist,
-      user: !chat.isGroup ? (exist as IUser) : null,
-      groupChat: chat.isGroup ? (exist as IGroupChat) : null,
+      user: !isGroup ? (exist as IUser) : null,
+      groupChat: isGroup ? (exist as IGroupChat) : null,
     };
   } catch (err: any) {
-    handleVerificationError(client, chat, contact, err);
+    handleVerificationError(client, chat, contact, err, isGroup);
     return null;
   }
 };
@@ -82,9 +83,10 @@ const handleVerificationError = async (
   client: Client,
   chat: Chat,
   contact: Contact,
-  err: any
+  err: any,
+  isGroup: boolean
 ) => {
-  const errorMessage = chat.isGroup
+  const errorMessage = isGroup
     ? `Terjadi kesalahan saat mengecek status verifikasi group: ${err.message}`
     : `Terjadi kesalahan saat mengecek status verifikasi user: ${err.message}`;
 

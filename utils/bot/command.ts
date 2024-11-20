@@ -9,12 +9,13 @@ export const getActiveCommands = async (
   client: Client,
   chat: Chat,
   contact: Contact,
-  msg: string
+  msg: string,
+  isGroup: boolean
 ) => {
   try {
     let filter: any = { isActive: true };
 
-    if (chat.isGroup) {
+    if (isGroup) {
       const groupChat = await GroupChat.searchGroupChat(chat.id._serialized);
 
       filter.isGroup = true;
@@ -53,12 +54,13 @@ export const getCommandList = async (
   client: Client,
   message: Message,
   chat: Chat,
-  contact: Contact
+  contact: Contact,
+  isGroup: boolean
 ) => {
   try {
     let filter: any = { isActive: true };
 
-    if (chat.isGroup) {
+    if (isGroup) {
       const groupChat = await GroupChat.findOne({
         "groupId._serialized": chat.id._serialized,
         isActive: true,

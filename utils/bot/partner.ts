@@ -104,7 +104,8 @@ export const partnerBusy = async (
 export const partnerStatus = async (
   message: Message,
   msg: string,
-  chat: Chat
+  chat: Chat,
+  isGroup: boolean
 ) => {
   try {
     const filter: any = { isActive: true };
@@ -155,7 +156,7 @@ export const partnerStatus = async (
           return `✅ ${getGenderEmote(partner.userId?.gender ?? "-")}${
             partner.userId?.name ?? partner.userId?.credential.username ?? "-"
           } (${formatDate(partner.updatedAt)}${
-            chat.isGroup ? `, @${partner.userId?.whatsapp.number}` : ""
+            isGroup ? `, @${partner.userId?.whatsapp.number}` : ""
           })${partner.reason?.length ? `: ${partner.reason}` : ""}`;
         })
         .join("\n");

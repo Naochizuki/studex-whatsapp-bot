@@ -9,8 +9,7 @@ interface WAUser {
 
 interface TGroupChat extends SoftDeleteDocument {
   groupId: WAUser;
-  owner: WAUser;
-  size: number;
+  // owner: WAUser;
   isPartner: boolean;
   isActive: boolean;
 }
@@ -41,26 +40,26 @@ const groupChatSchema: Schema<IGroupChat> = new Schema(
         unique: [true, "Group chat sudah terdaftar"],
       },
     },
-    owner: {
-      server: {
-        type: String,
-        required: true,
-        default: "c.us",
-      },
-      user: {
-        type: String,
-        required: true,
-      },
-      _serialized: {
-        type: String,
-        required: true,
-      },
-    },
-    size: {
-      type: Number,
-      required: true,
-      default: 2,
-    },
+    // owner: {
+    //   server: {
+    //     type: String,
+    //     required: true,
+    //     default: "c.us",
+    //   },
+    //   user: {
+    //     type: String,
+    //     required: true,
+    //   },
+    //   _serialized: {
+    //     type: String,
+    //     required: true,
+    //   },
+    // },
+    // size: {
+    //   type: Number,
+    //   required: true,
+    //   default: 2,
+    // },
     isPartner: {
       type: Boolean,
       required: true,

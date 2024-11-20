@@ -12,8 +12,8 @@ import {
 // Inisialisasi Whatsapp Client
 export const client1 = new Client({
   authStrategy: new LocalAuth({
-    clientId: "whatsapp-bot-1"
-  })
+    clientId: "whatsapp-bot-1",
+  }),
 });
 
 const connectWA = async () => {
@@ -47,8 +47,9 @@ const connectWA = async () => {
     client1.on("message", async (message) => {
       try {
         const chat: Chat = await message.getChat();
+        const isGroup: boolean = chat.isGroup ?? chat.id.server === "g.us";
         const contact: Contact = await message.getContact();
-        const registered = await isRegistered(client1, chat, contact);
+        const registered = await isRegistered(client1, chat, contact, isGroup);
         const msg: string = message?.body;
 
         if (msg.startsWith("-")) {
@@ -59,7 +60,8 @@ const connectWA = async () => {
               chat,
               contact,
               message,
-              registered.user
+              registered.user,
+              isGroup
             );
           } else if (registered?.exist && registered.groupChat) {
             await handleCommandGroupFlow(
@@ -68,9 +70,10 @@ const connectWA = async () => {
               chat,
               message,
               contact,
-              registered.groupChat
+              registered.groupChat,
+              isGroup
             );
-          } else if (!chat.isGroup && contact.isUser) {
+          } else if (!isGroup && contact.isUser) {
             await handleNonRegisteredUserCommand(
               client1,
               msg,
@@ -78,7 +81,7 @@ const connectWA = async () => {
               contact,
               message
             );
-          } else if (chat.isGroup) {
+          } else if (isGroup) {
             await handleNonRegisteredGroupCommand(
               client1,
               msg,
@@ -94,7 +97,8 @@ const connectWA = async () => {
             chat,
             contact,
             message,
-            registered.user
+            registered.user,
+            isGroup
           );
         }
       } catch (err: any) {

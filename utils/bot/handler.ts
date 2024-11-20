@@ -24,7 +24,8 @@ export const handleCommandGroupFlow = async (
   chat: Chat,
   message: Message,
   contact: Contact,
-  group: IGroupChat
+  group: IGroupChat,
+  isGroup: boolean
 ) => {
   if (!msg || !group)
     sendMessage(
@@ -33,7 +34,7 @@ export const handleCommandGroupFlow = async (
       "Pesan tidak valid atau group chat tidak ditemukan."
     );
 
-  const command = await getActiveCommands(client, chat, contact, msg);
+  const command = await getActiveCommands(client, chat, contact, msg, isGroup);
 
   if (command) {
     await handleGroupCommand(
@@ -43,7 +44,8 @@ export const handleCommandGroupFlow = async (
       message,
       client,
       group,
-      command
+      command,
+      isGroup
     );
   }
 };
@@ -54,7 +56,8 @@ export const handleCommandUserFlow = async (
   chat: Chat,
   contact: Contact,
   message: Message,
-  user: IUser
+  user: IUser,
+  isGroup: boolean
 ) => {
   if (!msg || !user)
     sendMessage(
@@ -63,14 +66,14 @@ export const handleCommandUserFlow = async (
       "Pesan tidak valid atau pengguna tidak ditemukan."
     );
 
-  const command = await getActiveCommands(client, chat, contact, msg);
+  const command = await getActiveCommands(client, chat, contact, msg, isGroup);
 
   if (command) {
     user.lastCommand = msg;
     await user.save();
 
-    await handleUserCommand(msg, chat, contact, message, client, user);
-  } else if (!chat.isGroup) {
+    await handleUserCommand(msg, chat, contact, message, client, user, isGroup);
+  } else if (!isGroup) {
     message.reply("Mohon maaf, command tidak ada dalam daftar.");
   }
 };
@@ -86,13 +89,15 @@ export const handleNonRegisteredGroupCommand = async (
 
   if (!group && msg === "-start") {
     await registerGroupChat(client, message, contact, chat);
-  } else if (!group && msg !== "-start") {
-    sendMessage(
-      client,
-      chat.id._serialized,
-      "Gunakan command _-start_ untuk menggunakan bot ini!"
-    );
   }
+
+  // else if (!group && msg !== "-start") {
+  //   sendMessage(
+  //     client,
+  //     chat.id._serialized,
+  //     "Gunakan command _-start_ untuk menggunakan bot ini!"
+  //   );
+  // }
 };
 
 export const handleNonRegisteredUserCommand = async (
@@ -140,7 +145,8 @@ export const handleNonCommandFlow = async (
   chat: Chat,
   contact: Contact,
   message: Message,
-  user: IUser
+  user: IUser,
+  isGroup: boolean
 ) => {
   if (!msg || !user)
     sendMessage(
@@ -158,7 +164,15 @@ export const handleNonCommandFlow = async (
     isPartnerInRegistrationFlow(partner?.state ?? "") ||
     isInFlow(user.state)
   ) {
-    await handleUserLastCommand(msg, chat, contact, message, client, user);
+    await handleUserLastCommand(
+      msg,
+      chat,
+      contact,
+      message,
+      client,
+      user,
+      isGroup
+    );
   }
 };
 
@@ -195,7 +209,8 @@ const handleUserLastCommand = async (
   contact: Contact,
   message: Message,
   client: Client,
-  user: IUser
+  user: IUser,
+  isGroup: boolean
 ) => {
   try {
     if (!msg || !user)
@@ -205,7 +220,7 @@ const handleUserLastCommand = async (
         "Pesan tidak valid atau pengguna tidak ditemukan."
       );
 
-    if (!chat.isGroup && user.state.startsWith("ask")) {
+    if (!isGroup && user.state.startsWith("ask")) {
       switch (user.lastCommand) {
         case "-start":
           await startUserNext(client, message, msg, contact, user, user?.state);
@@ -229,7 +244,7 @@ const handleUserLastCommand = async (
       }
     }
 
-    if (!chat.isGroup && user.state === "addOrder") {
+    if (!isGroup && user.state === "addOrder") {
       await handleOrderForwardedMessage(client, msg, message, contact, user);
     }
   } catch (err: any) {
@@ -318,7 +333,8 @@ const handleGroupCommand = async (
   message: Message,
   client: Client,
   group: IGroupChat,
-  command: ICommand
+  command: ICommand,
+  isGroup: boolean
 ) => {
   try {
     if (!msg || !group)
@@ -328,10 +344,10 @@ const handleGroupCommand = async (
         "Pesan tidak valid atau group chat tidak ditemukan."
       );
 
-    if (chat.isGroup && group) {
+    if (isGroup && group) {
       switch (msg) {
         case "-commandlist":
-          await getCommandList(client, message, chat, contact);
+          await getCommandList(client, message, chat, contact, isGroup);
           break;
         case "-start":
           replyMessage(
@@ -340,7 +356,7 @@ const handleGroupCommand = async (
           );
           break;
         case msg.startsWith("-status") && msg:
-          await partnerStatus(message, msg, chat);
+          await partnerStatus(message, msg, chat, isGroup);
           break;
         case msg.startsWith("-ready") && msg:
           if (command.isPersonal) {
@@ -375,7 +391,8 @@ const handleUserCommand = async (
   contact: Contact,
   message: Message,
   client: Client,
-  user: IUser
+  user: IUser,
+  isGroup: boolean
 ) => {
   try {
     if (!msg || !user)
@@ -385,10 +402,10 @@ const handleUserCommand = async (
         "Pesan tidak valid atau pengguna tidak ditemukan."
       );
 
-    if (!chat.isGroup && user) {
+    if (!isGroup && user) {
       switch (msg) {
         case "-commandlist":
-          await getCommandList(client, message, chat, contact);
+          await getCommandList(client, message, chat, contact, isGroup);
           break;
         case "-start":
           if (user.state.startsWith("-ask")) {
@@ -423,7 +440,7 @@ const handleUserCommand = async (
             replyMessage(message, "Hanya admin yang dapat menambahkan mitra.");
           break;
         case msg.startsWith("-status") && msg:
-          await partnerStatus(message, msg, chat);
+          await partnerStatus(message, msg, chat, isGroup);
           break;
         case "-addorder":
           await handleOrderForwardedMessage(

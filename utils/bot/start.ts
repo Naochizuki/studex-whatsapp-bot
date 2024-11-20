@@ -31,10 +31,11 @@ export const registerGroupChat = async (
 
     const group = chat as GC;
 
+    console.log(group);
     const payload = {
       groupId: group.id,
-      owner: group.owner,
-      size: group.participants.length,
+      // owner: group.owner,
+      // size: group.participants.length,
       isActive: true,
     };
 
@@ -46,6 +47,7 @@ export const registerGroupChat = async (
       "Selamat, bot sudah dapat digunakan di Group Chat ini."
     );
   } catch (err: any) {
+    console.log(err);
     replyMessage(message, "Terjadi kesalahan saat mendaftarkan group chat.");
     sendErrorToAdmin(
       client,

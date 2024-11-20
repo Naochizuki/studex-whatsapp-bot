@@ -11,7 +11,7 @@ export const app = express();
 const port = 8888;
 
 connectDB();
-const qrCode = connectWA();
+connectWA();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -19,14 +19,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(CommandRoute);
-
-app.get('/qr', (req, res) => {
-  if (qrCodeUrl) {
-    res.send(`<img src=${qrCodeUrl} alt="QR Code" />`);
-  } else {
-    res.send('QR code not available yet.');
-  }
-})
 
 app.disable("x-powered-by");
 

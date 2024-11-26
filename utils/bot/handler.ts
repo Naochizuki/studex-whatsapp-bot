@@ -17,6 +17,8 @@ import {
 import { sendErrorToAdmin } from "./error";
 import { handleOrderForwardedMessage } from "./order";
 import type { ICommand } from "../../app/models/command.model";
+import { askGpt } from "./gpt";
+import type { ChatGPTAPI } from "chatgpt";
 
 export const handleCommandGroupFlow = async (
   client: Client,
@@ -57,7 +59,8 @@ export const handleCommandUserFlow = async (
   contact: Contact,
   message: Message,
   user: IUser,
-  isGroup: boolean
+  isGroup: boolean,
+  GPTClient: ChatGPTAPI
 ) => {
   if (!msg || !user)
     sendMessage(
@@ -72,7 +75,16 @@ export const handleCommandUserFlow = async (
     user.lastCommand = msg;
     await user.save();
 
-    await handleUserCommand(msg, chat, contact, message, client, user, isGroup);
+    await handleUserCommand(
+      msg,
+      chat,
+      contact,
+      message,
+      client,
+      user,
+      isGroup,
+      GPTClient
+    );
   } else if (!isGroup) {
     message.reply("Mohon maaf, command tidak ada dalam daftar.");
   }
@@ -392,7 +404,8 @@ const handleUserCommand = async (
   message: Message,
   client: Client,
   user: IUser,
-  isGroup: boolean
+  isGroup: boolean,
+  GPTClient: ChatGPTAPI
 ) => {
   try {
     if (!msg || !user)
@@ -406,6 +419,9 @@ const handleUserCommand = async (
       switch (msg) {
         case "-commandlist":
           await getCommandList(client, message, chat, contact, isGroup);
+          break;
+        case msg.startsWith("-ask") && msg:
+          await askGpt(GPTClient, msg);
           break;
         case "-start":
           if (user.state.startsWith("-ask")) {

@@ -1,5 +1,6 @@
 import { Client, LocalAuth, type Chat, type Contact } from "whatsapp-web.js";
 import qrcode from "qrcode-terminal";
+import { ChatGPTAPI } from "chatgpt";
 import { isRegistered } from "./bot/user";
 import {
   handleCommandGroupFlow,
@@ -8,6 +9,12 @@ import {
   handleNonRegisteredGroupCommand,
   handleNonRegisteredUserCommand,
 } from "./bot/handler";
+import "dotenv/config";
+
+// OpenAI Client
+export const GPTClient = new ChatGPTAPI({
+  apiKey: process.env.OPENAI_API_KEY ?? "",
+});
 
 // Inisialisasi Whatsapp Client
 export const client1 = new Client({
@@ -61,7 +68,8 @@ const connectWA = async () => {
               contact,
               message,
               registered.user,
-              isGroup
+              isGroup,
+              GPTClient
             );
           } else if (registered?.exist && registered.groupChat) {
             await handleCommandGroupFlow(

@@ -7,6 +7,8 @@ import User from "../../app/models/user.model";
 import { replyMessage, sendMessage } from "../common";
 import { datetimeFormat, isToday, isYesterday } from "utilboost";
 
+const dangerWord = ["malas", "males", "badmood", "mager"];
+
 export const createCollectionPartner = async (
   client: Client,
   contact: Contact
@@ -51,6 +53,9 @@ export const partnerReady = async (
     const reason = msg.slice(6).trim();
     const partner = await Partner.findOne({ userId: user.id });
 
+    if (dangerWord.some((word: string) => reason.toLowerCase().includes(word)))
+      message.reply("BISA GAK JANGAN PAKE ALESAN ITU!!!!!!!!");
+
     if (!partner)
       message.reply("Maaf, anda bukan tidak termasuk dalam mitra kami!");
     else {
@@ -78,18 +83,24 @@ export const partnerBusy = async (
 ) => {
   try {
     const reason = msg.slice(6).trim();
-    if (!reason)
+    if (!reason) {
       message.reply("Mohon sertakan alasan kenapa mitra sedang sibuk!");
+    } else {
+      if (
+        dangerWord.some((word: string) => reason.toLowerCase().includes(word))
+      )
+        message.reply("BISA GAK JANGAN PAKE ALESAN ITU!!!!!!!!");
 
-    const partner = await Partner.findOne({ userId: user.id });
+      const partner = await Partner.findOne({ userId: user.id });
 
-    if (!partner)
-      message.reply("Maaf, anda bukan tidak termasuk dalam mitra kami!");
-    else {
-      partner.isReady = false;
-      partner.reason = reason;
-      await partner.save();
-      message.reply("Status partner berhasil diubah menjadi busy.");
+      if (!partner)
+        message.reply("Maaf, anda bukan tidak termasuk dalam mitra kami!");
+      else {
+        partner.isReady = false;
+        partner.reason = reason;
+        await partner.save();
+        message.reply("Status partner berhasil diubah menjadi busy.");
+      }
     }
   } catch (err: any) {
     sendErrorToAdmin(

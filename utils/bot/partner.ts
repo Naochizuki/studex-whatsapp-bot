@@ -53,8 +53,12 @@ export const partnerReady = async (
     const reason = msg.slice(6).trim();
     const partner = await Partner.findOne({ userId: user.id });
 
-    if (dangerWord.some((word: string) => reason.toLowerCase().includes(word)))
+    if (
+      dangerWord.some((word: string) => reason.toLowerCase().includes(word))
+    ) {
       message.reply("BISA GAK JANGAN PAKE ALESAN ITU!!!!!!!!");
+      return;
+    }
 
     if (!partner)
       message.reply("Maaf, anda bukan tidak termasuk dalam mitra kami!");
@@ -88,8 +92,10 @@ export const partnerBusy = async (
     } else {
       if (
         dangerWord.some((word: string) => reason.toLowerCase().includes(word))
-      )
+      ) {
         message.reply("BISA GAK JANGAN PAKE ALESAN ITU!!!!!!!!");
+        return;
+      }
 
       const partner = await Partner.findOne({ userId: user.id });
 

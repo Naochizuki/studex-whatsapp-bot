@@ -362,14 +362,16 @@ const handleGroupCommand = async (
           if (command.isPersonal) {
             const user = await User.searchUser(contact.id._serialized, false);
 
-            if (user) await partnerReady(client, msg, message, contact, user);
+            if (user)
+              await partnerReady(client, msg, message, chat, contact, user);
           }
           break;
         case msg.startsWith("-busy") && msg:
           if (command.isPersonal) {
             const user = await User.searchUser(contact.id._serialized, false);
 
-            if (user) await partnerBusy(client, msg, message, contact, user);
+            if (user)
+              await partnerBusy(client, msg, message, chat, contact, user);
           }
           break;
         default:
@@ -425,10 +427,10 @@ const handleUserCommand = async (
           }
           break;
         case msg.startsWith("-ready") && msg:
-          await partnerReady(client, msg, message, contact, user);
+          await partnerReady(client, msg, message, chat, contact, user);
           break;
         case msg.startsWith("-busy") && msg:
-          await partnerBusy(client, msg, message, contact, user);
+          await partnerBusy(client, msg, message, chat, contact, user);
           break;
         case "-info":
           await handleInfoCommand(message, user);

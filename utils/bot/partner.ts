@@ -1,5 +1,11 @@
 import Partner, { type IPartner } from "../../app/models/partner.model";
-import { Client, type Chat, type Contact, type Message } from "whatsapp-web.js";
+import {
+  Client,
+  MessageMedia,
+  type Chat,
+  type Contact,
+  type Message,
+} from "whatsapp-web.js";
 import { sendErrorToAdmin } from "./error";
 import type { IUser } from "../../app/models/user.model";
 import Service, { type IService } from "../../app/models/service.model";
@@ -7,7 +13,7 @@ import User from "../../app/models/user.model";
 import { replyMessage, sendMessage } from "../common";
 import { datetimeFormat, isToday, isYesterday } from "utilboost";
 
-const dangerWord = ["malas", "males", "badmood", "mager"];
+const forbiddenWord = ["malas", "males", "badmood", "mager"];
 
 export const createCollectionPartner = async (
   client: Client,
@@ -46,6 +52,7 @@ export const partnerReady = async (
   client: Client,
   msg: string,
   message: Message,
+  chat: Chat,
   contact: Contact,
   user: IUser
 ) => {
@@ -54,9 +61,14 @@ export const partnerReady = async (
     const partner = await Partner.findOne({ userId: user.id });
 
     if (
-      dangerWord.some((word: string) => reason.toLowerCase().includes(word))
+      forbiddenWord.some((word: string) => reason.toLowerCase().includes(word))
     ) {
       message.reply("BISA GAK JANGAN PAKE ALESAN ITU!!!!!!!!");
+      if (["6285727079398@c.us"].includes(chat.id._serialized)) {
+        const sticker = MessageMedia.fromFilePath("img/wle.png");
+        chat.sendMessage(sticker, { sendMediaAsSticker: true });
+      }
+
       return;
     }
 
@@ -82,6 +94,7 @@ export const partnerBusy = async (
   client: Client,
   msg: string,
   message: Message,
+  chat: Chat,
   contact: Contact,
   user: IUser
 ) => {
@@ -91,9 +104,20 @@ export const partnerBusy = async (
       message.reply("Mohon sertakan alasan kenapa mitra sedang sibuk!");
     } else {
       if (
-        dangerWord.some((word: string) => reason.toLowerCase().includes(word))
+        forbiddenWord.some((word: string) =>
+          reason.toLowerCase().replaceAll(" ", "").includes(word)
+        )
       ) {
         message.reply("BISA GAK JANGAN PAKE ALESAN ITU!!!!!!!!");
+        if (
+          ["6289510491535@c.us", "6285727079398@c.us"].includes(
+            chat.id._serialized
+          )
+        ) {
+          const sticker = MessageMedia.fromFilePath("img/wle.png");
+          chat.sendMessage(sticker, { sendMediaAsSticker: true });
+        }
+
         return;
       }
 

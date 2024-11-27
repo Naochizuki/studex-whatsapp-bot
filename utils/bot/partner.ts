@@ -64,7 +64,7 @@ export const partnerReady = async (
       forbiddenWord.some((word: string) => reason.toLowerCase().includes(word))
     ) {
       message.reply("BISA GAK JANGAN PAKE ALESAN ITU!!!!!!!!");
-      if (["6285727079398@c.us"].includes(chat.id._serialized)) {
+      if (["6285727079398@c.us"].includes(contact.id._serialized)) {
         const sticker = MessageMedia.fromFilePath("img/wle.png");
         chat.sendMessage(sticker, { sendMediaAsSticker: true });
       }
@@ -111,7 +111,7 @@ export const partnerBusy = async (
         message.reply("BISA GAK JANGAN PAKE ALESAN ITU!!!!!!!!");
         if (
           ["6289510491535@c.us", "6285727079398@c.us"].includes(
-            chat.id._serialized
+            contact.id._serialized
           )
         ) {
           const sticker = MessageMedia.fromFilePath("img/wle.png");

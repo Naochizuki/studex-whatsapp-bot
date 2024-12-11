@@ -53,7 +53,7 @@ const connectWA = async () => {
         const registered = await isRegistered(client1, chat, contact, isGroup);
         const msg: string = message?.body;
 
-        if (msg.startsWith("-")) {
+        if (msg.startsWith("-") && !message.isForwarded) {
           if (registered?.exist && registered.user) {
             await handleCommandUserFlow(
               client1,

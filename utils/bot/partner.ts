@@ -13,7 +13,17 @@ import User from "../../app/models/user.model";
 import { replyMessage, sendMessage } from "../common";
 import { datetimeFormat, isToday, isYesterday } from "utilboost";
 
-const forbiddenWord = ["malas", "males", "badmood", "mager"];
+const forbiddenWord = [
+  "malas",
+  "males",
+  "badmood",
+  "mager",
+  "mls",
+  "mlz",
+  "betmut",
+  "malaz",
+  "malez",
+];
 
 export const createCollectionPartner = async (
   client: Client,
@@ -57,7 +67,10 @@ export const partnerReady = async (
   user: IUser
 ) => {
   try {
-    const reason = msg.slice(6).trim();
+    const reason = msg
+      .slice(6)
+      .replaceAll(/[\ud800-\udfff]/g, "")
+      .trim();
     const partner = await Partner.findOne({ userId: user.id });
 
     if (
@@ -99,7 +112,10 @@ export const partnerBusy = async (
   user: IUser
 ) => {
   try {
-    const reason = msg.slice(6).trim();
+    const reason = msg
+      .slice(6)
+      .replaceAll(/[\ud800-\udfff]/g, "")
+      .trim();
     if (!reason) {
       message.reply("Mohon sertakan alasan kenapa mitra sedang sibuk!");
     } else {

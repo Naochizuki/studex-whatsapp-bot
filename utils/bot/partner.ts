@@ -12,6 +12,7 @@ import Service, { type IService } from "../../app/models/service.model";
 import User from "../../app/models/user.model";
 import { replyMessage, sendMessage } from "../common";
 import { datetimeFormat, isToday, isYesterday } from "utilboost";
+import emojiRegex from "emoji-regex";
 
 const forbiddenWord = [
   "malas",
@@ -67,9 +68,10 @@ export const partnerReady = async (
   user: IUser
 ) => {
   try {
+    const regex = emojiRegex();
     const reason = msg
       .slice(6)
-      .replaceAll(/[\ud800-\udfff]/g, "")
+      .replaceAll(new RegExp(`[^\\w\\s${regex.source}]`, "g"), "")
       .trim();
     const partner = await Partner.findOne({ userId: user.id });
 
@@ -112,9 +114,10 @@ export const partnerBusy = async (
   user: IUser
 ) => {
   try {
+    const regex = emojiRegex();
     const reason = msg
       .slice(6)
-      .replaceAll(/[\ud800-\udfff]/g, "")
+      .replaceAll(new RegExp(`[^\\w\\s${regex.source}]`, "g"), "")
       .trim();
     if (!reason) {
       message.reply("Mohon sertakan alasan kenapa mitra sedang sibuk!");
